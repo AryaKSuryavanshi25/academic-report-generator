@@ -30,9 +30,16 @@ export default function Footer() {
           {/* Map and Social Section */}
           <div className="footer-section map-social">
             <div className="map-placeholder">
-              {/* Replace this with an actual Google Maps iframe if needed */}
-              <img src="https://via.placeholder.com/400x200?text=Google+Maps+View" alt="Map Location" />
-            </div>
+  <iframe
+    title="FCRIT Map Location"
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.671877735571!2d72.98784097981956!3d19.07546518710301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7d0d2f70ee137%3A0x3e59b715c04b357c!2sFr.%20C.%20Rodrigues%20Institute%20of%20Technology!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+    style={{ border: 0 }}
+    allowFullScreen=""
+    loading="lazy"
+    referrerPolicy="no-referrer-when-downgrade"
+  ></iframe>
+</div>
+
             <div className="social-links">
               <a href="#" className="social-icon facebook">f</a>
               <a href="#" className="social-icon instagram"></a>
