@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../styles/form-styles.css";
 import PdfWithCaptionSection from "./PdfWithCaptionSection";
 
-export default function OutreachForm() {
+export default function SportsCulturalForm() {
 
   const [brochures, setBrochures] = useState([{ file: null, caption: "" }]);
   const [attendance, setAttendance] = useState([{ file: null, caption: "" }]);
@@ -15,15 +15,8 @@ export default function OutreachForm() {
       <section className="form-section">
         <h3>Basic Details</h3>
         <div className="form-grid">
-
-          <label>Name of Department / Institute Level Committee</label>
-          <input type="text" />
-
           <label>Name of the Activity / Event</label>
-          <input
-            type="text"
-            placeholder="Needs to be mentioned with clarity"
-          />
+          <input type="text" />
 
           <label>Venue</label>
           <input type="text" />
@@ -34,10 +27,7 @@ export default function OutreachForm() {
           <label>Date (To)</label>
           <input type="date" />
 
-          <label>Number of Beneficiaries</label>
-          <input type="number" min="0" />
-
-          <label>Number of Student Volunteers</label>
+          <label>Number of Students Participated</label>
           <input type="number" min="0" />
 
           <label>Student Coordinator</label>
@@ -45,25 +35,20 @@ export default function OutreachForm() {
 
           <label>Staff Coordinator</label>
           <input type="text" />
-
-          <label>Collaborating Agency</label>
-          <input type="text" />
-
         </div>
       </section>
 
-      {/* BROCHURE / NEWSPAPER CUTTING */}
+      {/* BROCHURE / POSTER */}
       <PdfWithCaptionSection
-        title="Brochure / Newspaper Cutting (PDF)"
+        title="Brochure / Poster (PDF)"
         items={brochures}
         setItems={setBrochures}
       />
 
       {/* SUMMARY */}
       <section className="form-section">
-        <h3>Brief Summary of the Activity</h3>
+        <h3>Brief Summary of the Activity / Event</h3>
         <div className="form-grid">
-
           <label>Objectives</label>
           <textarea rows="3" />
 
@@ -72,30 +57,26 @@ export default function OutreachForm() {
 
           <label>Outcomes</label>
           <textarea rows="3" />
-
-          <label>Impact Analysis</label>
-          <textarea rows="3" />
-
         </div>
       </section>
 
       {/* ATTENDANCE */}
       <PdfWithCaptionSection
-        title="Attendance of Student Volunteers (PDF)"
+        title="Attendance of Participants (PDF)"
         items={attendance}
         setItems={setAttendance}
       />
 
       {/* GEO TAGGED PHOTOS */}
       <PdfWithCaptionSection
-        title="Geo-tagged Photograph (PDF)"
+        title="Geo-tagged Photographs (PDF)"
         items={geoPhotos}
         setItems={setGeoPhotos}
       />
 
-      {/* SAMPLE CERTIFICATE */}
+      {/* CERTIFICATE (NO CAPTION) */}
       <section className="form-section">
-        <h3>Sample Certificate of Student Volunteers (PDF)</h3>
+        <h3>Sample Certificate (PDF)</h3>
         <div className="form-grid">
           <label>Upload Certificate</label>
           <input type="file" accept="application/pdf" />
@@ -112,3 +93,4 @@ export default function OutreachForm() {
     </form>
   );
 }
+  

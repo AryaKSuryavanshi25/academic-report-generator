@@ -2,28 +2,26 @@ import { useState } from "react";
 import "../styles/form-styles.css";
 import PdfWithCaptionSection from "./PdfWithCaptionSection";
 
-export default function CertificationForm() {
+export default function FDPSTTPForm() {
 
   const [brochures, setBrochures] = useState([{ file: null, caption: "" }]);
-  const [students, setStudents] = useState([{ file: null, caption: "" }]);
+  const [participants, setParticipants] = useState([{ file: null, caption: "" }]);
   const [attendance, setAttendance] = useState([{ file: null, caption: "" }]);
   const [geoPhotos, setGeoPhotos] = useState([{ file: null, caption: "" }]);
   const [feedbackPDFs, setFeedbackPDFs] = useState([null]);
 
-  const addFeedback = () => setFeedbackPDFs([...feedbackPDFs, null]);
-
   return (
     <form className="fdp-form">
 
-      {/* ACTIVITY DETAILS */}
+      {/* BASIC DETAILS */}
       <section className="form-section">
-        <h3>Activity Details</h3>
+        <h3>Basic Details</h3>
         <div className="form-grid">
           <label>Name of Department / Committee</label>
           <input type="text" />
 
-          <label>Name of the Activity / Event</label>
-          <input type="text" placeholder="Certification Program on …" />
+          <label>Name of Activity / Event</label>
+          <input type="text" />
 
           <label>Venue</label>
           <input type="text" />
@@ -35,43 +33,42 @@ export default function CertificationForm() {
           <input type="date" />
 
           <label>Duration</label>
-          <input type="text" placeholder="e.g. 5 Days" />
+          <input type="text" placeholder="e.g. 6 Days" />
 
           <label>Staff Coordinator(s)</label>
           <textarea rows="2" />
 
-          <label>Details of Resource Persons</label>
+          <label>Resource Persons Details</label>
           <textarea rows="3" />
         </div>
       </section>
 
-      {/* BROCHURE */}
+      {/* PDF SECTIONS WITH CAPTION */}
       <PdfWithCaptionSection
         title="Brochure (PDF)"
         items={brochures}
         setItems={setBrochures}
       />
 
-      {/* CURRICULUM */}
-      <section className="form-section">
-        <h3>Detailed Curriculum</h3>
-        <div className="form-grid">
-          <label>Curriculum with Hours</label>
-          <textarea
-            rows="4"
-            placeholder="Module 1 – Basics (2 hours)"
-          />
-        </div>
-      </section>
-
-      {/* STUDENTS ENROLLED */}
       <PdfWithCaptionSection
-        title="List of Students Enrolled (PDF)"
-        items={students}
-        setItems={setStudents}
+        title="List of Participants (PDF)"
+        items={participants}
+        setItems={setParticipants}
       />
 
-      {/* ACTIVITY SUMMARY */}
+      <PdfWithCaptionSection
+        title="Attendance of Participants (PDF)"
+        items={attendance}
+        setItems={setAttendance}
+      />
+
+      <PdfWithCaptionSection
+        title="Geo-tagged Photographs (PDF)"
+        items={geoPhotos}
+        setItems={setGeoPhotos}
+      />
+
+      {/* SUMMARY */}
       <section className="form-section">
         <h3>Brief Summary of the Activity</h3>
         <div className="form-grid">
@@ -83,22 +80,12 @@ export default function CertificationForm() {
 
           <label>Outcomes</label>
           <textarea rows="3" />
-
-          <label>Assessment Details</label>
-          <textarea rows="3" />
         </div>
       </section>
 
-      {/* ATTENDANCE */}
-      <PdfWithCaptionSection
-        title="Attendance of Participants (PDF)"
-        items={attendance}
-        setItems={setAttendance}
-      />
-
-      {/* FEEDBACK – PDF ONLY (NO CAPTION) */}
+      {/* FEEDBACK – PDF ONLY */}
       <section className="form-section">
-        <h3>Feedback Summary (PDF)</h3>
+        <h3>Sample Feedback with Summary (PDF)</h3>
 
         {feedbackPDFs.map((_, index) => (
           <div className="form-grid" key={index}>
@@ -107,8 +94,12 @@ export default function CertificationForm() {
           </div>
         ))}
 
-        <button type="button" className="add-btn" onClick={addFeedback}>
-          + Add More
+        <button
+          type="button"
+          className="add-btn"
+          onClick={() => setFeedbackPDFs([...feedbackPDFs, null])}
+        >
+          + Add More Feedback PDFs
         </button>
       </section>
 
@@ -116,19 +107,12 @@ export default function CertificationForm() {
       <section className="form-section">
         <h3>Impact Analysis</h3>
         <div className="form-grid">
-          <label>Impact Description</label>
-          <textarea rows="3" />
+          <label>Impact Analysis Description</label>
+          <textarea rows="4" />
         </div>
       </section>
 
-      {/* GEO TAGGED PHOTOS */}
-      <PdfWithCaptionSection
-        title="Geo-tagged Photographs (PDF)"
-        items={geoPhotos}
-        setItems={setGeoPhotos}
-      />
-
-      {/* CERTIFICATE – NO CAPTION */}
+      {/* CERTIFICATE – PDF ONLY */}
       <section className="form-section">
         <h3>Sample Certificate (PDF)</h3>
         <div className="form-grid">
@@ -138,11 +122,11 @@ export default function CertificationForm() {
       </section>
 
       {/* SAVE */}
-      <section className="form-section">
+      <div className="form-section">
         <button type="submit" className="submit-btn">
           Save Form
         </button>
-      </section>
+      </div>
 
     </form>
   );
