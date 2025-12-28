@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../styles/form-styles.css";
 import PdfWithCaptionSection from "./PdfWithCaptionSection";
 
-export default function WorkshopForm() {
+export default function WorkshopSeminarForm() {
 
   const [brochures, setBrochures] = useState([{ file: null, caption: "" }]);
   const [attendance, setAttendance] = useState([{ file: null, caption: "" }]);
@@ -18,11 +18,18 @@ export default function WorkshopForm() {
         <h3>Basic Details</h3>
         <div className="form-grid">
 
-          <label>Name of Department / Committee</label>
+          <label>Name of Department / Institute Level Committee</label>
           <input type="text" />
 
           <label>Name of the Activity / Event</label>
           <input type="text" placeholder="Seminar / Workshop on ..." />
+
+          <label>Report Type:</label>
+          <select name="report_type" required>
+          <option value="">Select</option>
+          <option value="SEMINAR">Seminar</option>
+          <option value="WORKSHOP">Workshop</option>
+          </select>
 
           <label>Venue</label>
           <input type="text" />

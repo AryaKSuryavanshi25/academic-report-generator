@@ -11,10 +11,16 @@ export default function InHouseForm() {
     <form className="inhouse-activity-form">
       {/* BASIC DETAILS */}
       <section className="form-section">
-        <h3>Name of the Department / Institute level Committee</h3>
+        <h3>Inhouse Details</h3>
         <div className="form-grid">
+          <label>Name of Department / Institute Level Committee</label>
+          <input type="text" />
+
           <label>Name of the Activity / Event</label>
           <input type="text" />
+
+          <label>Report Type</label>
+          <input type="readonly" name="report_type" value="INHOUSE"/>
 
           <label>Venue</label>
           <input type="text" />

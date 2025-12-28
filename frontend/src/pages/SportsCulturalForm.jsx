@@ -18,6 +18,13 @@ export default function SportsCulturalForm() {
           <label>Name of the Activity / Event</label>
           <input type="text" />
 
+          <label>Report Type:</label>
+          <select name="report_type" required>
+          <option value="">Select</option>
+          <option value="SPORTS">Sports</option>
+          <option value="CULTURAL">Cultural</option>
+          </select>
+
           <label>Venue</label>
           <input type="text" />
 

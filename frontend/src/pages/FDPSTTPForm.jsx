@@ -17,11 +17,18 @@ export default function FDPSTTPForm() {
       <section className="form-section">
         <h3>Basic Details</h3>
         <div className="form-grid">
-          <label>Name of Department / Committee</label>
+          <label>Name of Department / Institute Level Committee</label>
           <input type="text" />
 
           <label>Name of Activity / Event</label>
           <input type="text" />
+
+          <label>Report Type:</label>
+          <select name="report_type" required>
+          <option value="">Select</option>
+          <option value="FDP">FDP</option>
+          <option value="STTP">STTP</option>
+          </select>
 
           <label>Venue</label>
           <input type="text" />

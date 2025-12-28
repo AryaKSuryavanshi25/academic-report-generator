@@ -2,7 +2,7 @@ import FDPSTTPForm from "../pages/FDPSTTPForm";
 import SportsCulturalForm from "../pages/SportsCulturalForm";
 import InhouseForm from "../pages/InhouseForm";
 import OutreachForm from "../pages/OutreachForm";
-import WorkshopForm from "../pages/WorkshopForm";
+import WorkshopSeminarForm from "../pages/WorkshopSeminarForm";
 import CertificationForm from "../pages/CertificationForm";
 
 export default function FormLayout({ title }) {
@@ -36,7 +36,7 @@ export default function FormLayout({ title }) {
           )}
           {/* Workshop / Seminar FORM */}
           {title === "Workshop / Seminar Report" && (
-            <WorkshopForm />
+            <WorkshopSeminarForm />
           )}
           {/* Certification Program FORM */}
           {title === "Certification Program Report" && (

@@ -25,6 +25,9 @@ export default function OutreachForm() {
             placeholder="Needs to be mentioned with clarity"
           />
 
+          <label>Report Type</label>
+          <input type="readonly" name="report_type" value="OUTREACH"/>
+
           <label>Venue</label>
           <input type="text" />
 

@@ -19,11 +19,14 @@ export default function CertificationForm() {
       <section className="form-section">
         <h3>Activity Details</h3>
         <div className="form-grid">
-          <label>Name of Department / Committee</label>
+          <label>Name of Department / Institute Level Committee</label>
           <input type="text" />
 
           <label>Name of the Activity / Event</label>
           <input type="text" placeholder="Certification Program on …" />
+
+          <label>Report Type</label>
+          <input type="readonly" name="report_type" value="CERTIFICATION"/>
 
           <label>Venue</label>
           <input type="text" />
