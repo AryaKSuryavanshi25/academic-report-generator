@@ -3,6 +3,19 @@ export default function PdfWithCaptionSection({
   items,
   setItems,
 }) {
+
+  const handleFileChange = (index, file) => {
+    const updated = [...items];
+    updated[index].file = file;
+    setItems(updated);
+  };
+
+  const handleCaptionChange = (index, caption) => {
+    const updated = [...items];
+    updated[index].caption = caption;
+    setItems(updated);
+  };
+
   const addItem = () => {
     setItems([...items, { file: null, caption: "" }]);
   };
@@ -14,12 +27,22 @@ export default function PdfWithCaptionSection({
       {items.map((item, index) => (
         <div className="form-grid" key={index}>
           <label>Upload PDF</label>
-          <input type="file" accept="application/pdf" />
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) =>
+              handleFileChange(index, e.target.files[0])
+            }
+          />
 
           <label>Caption</label>
           <input
             type="text"
             placeholder="Enter caption"
+            value={item.caption}
+            onChange={(e) =>
+              handleCaptionChange(index, e.target.value)
+            }
           />
         </div>
       ))}
