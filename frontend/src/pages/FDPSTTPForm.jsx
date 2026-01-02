@@ -3,88 +3,88 @@ import "../styles/form-styles.css";
 import PdfWithCaptionSection from "./PdfWithCaptionSection";
 
 export default function FDPSTTPForm() {
-
   const [brochures, setBrochures] = useState([{ file: null, caption: "" }]);
-  const [participants, setParticipants] = useState([{ file: null, caption: "" }]);
+  const [participants, setParticipants] = useState([
+    { file: null, caption: "" },
+  ]);
   const [attendance, setAttendance] = useState([{ file: null, caption: "" }]);
   const [geoPhotos, setGeoPhotos] = useState([{ file: null, caption: "" }]);
   const [feedbackPDFs, setFeedbackPDFs] = useState([null]);
 
+  const addFeedback = () => setFeedbackPDFs([...feedbackPDFs, null]);
+
+  /* ================= SUBMIT HANDLER ================= */
   const handleSubmit = async (e) => {
-    console.log("SUBMIT CLICKED");
-
     e.preventDefault();
-
     const form = e.target;
     const formData = new FormData();
 
-    /* BASIC DETAILS */
-    formData.append("activity_name", form.activity_name.value);
+    /* ===== REPORTS TABLE ===== */
     formData.append("report_type", form.report_type.value);
+    formData.append("department_name", form.department_name.value);
+    formData.append("activity_name", form.activity_name.value);
     formData.append("venue", form.venue.value);
-    formData.append("start_date", form.date_from.value);
-    formData.append("end_date", form.date_to.value);
-    formData.append("staff_coordinator", form.staff_coordinators.value);
-    formData.append("details_of_resource_person", form.resource_persons.value);
+    formData.append("start_date", form.start_date.value);
+    formData.append("end_date", form.end_date.value);
+    formData.append("staff_coordinator", form.staff_coordinator.value);
+    formData.append(
+      "details_of_resource_person",
+      form.details_of_resource_person.value
+    );
 
-    /* SUMMARY */
-    formData.append("activity_objectives", form.objectives.value);
-    formData.append("activity_description", form.technical_description.value);
-    formData.append("activity_outcomes", form.outcomes.value);
+    formData.append("activity_objectives", form.activity_objectives.value);
+    formData.append("activity_description", form.activity_description.value);
+    formData.append("activity_outcomes", form.activity_outcomes.value);
+    formData.append(
+      "activity_impact_analysis",
+      form.activity_impact_analysis.value
+    );
 
-    /* IMPACT */
-    formData.append("activity_impact_analysis", form.impact_analysis.value);
-
-
-    /* FILE SECTIONS WITH CAPTION */
-    const appendFiles = (items, category) => {
-      items.forEach((item, index) => {
+    /* ===== FILE HANDLER (SAME PATTERN AS CERTIFICATION) ===== */
+    const appendFiles = (items, field) => {
+      items.forEach((item) => {
         if (item.file) {
-          formData.append(`${category}[${index}][file]`, item.file);
-          formData.append(`${category}[${index}][caption]`, item.caption);
+          formData.append(field, item.file);
+          formData.append(`caption_${field}`, item.caption);
         }
       });
     };
 
-    appendFiles(brochures, "brochures");
+    appendFiles(brochures, "brochure");
     appendFiles(participants, "participants");
     appendFiles(attendance, "attendance");
     appendFiles(geoPhotos, "geo_photos");
 
-    /* FEEDBACK PDFs (NO CAPTION) */
-    feedbackPDFs.forEach((file, index) => {
+    /* ===== FEEDBACK PDFs ===== */
+    feedbackPDFs.forEach((file) => {
       if (file) {
-        formData.append(`feedback[${index}]`, file);
+        formData.append("feedback", file);
       }
     });
 
-    /* CERTIFICATE */
-    if (form.certificate.files[0]) {
+    /* ===== CERTIFICATE (OPTIONAL) ===== */
+    if (form.certificate?.files[0]) {
       formData.append("certificate", form.certificate.files[0]);
     }
 
     try {
-      console.log("Sending request...");
-
       const res = await fetch("http://localhost:5000/api/reports", {
         method: "POST",
-        body: formData
+        body: formData,
       });
-      console.log("Response received", res.status);
 
       if (!res.ok) throw new Error("Failed");
-
-      alert("Report saved successfully");
+      alert("FDP / STTP report saved successfully ✅");
       form.reset();
     } catch (err) {
       console.error(err);
-      alert("Error saving report");
+      alert("Error saving FDP / STTP report ❌");
     }
   };
+  /* ================================================= */
 
   return (
     <form className="fdp-form" onSubmit={handleSubmit}>
-
       {/* BASIC DETAILS */}
       <section className="form-section">
         <h3>Basic Details</h3>
@@ -95,7 +95,7 @@ export default function FDPSTTPForm() {
           <label>Name of Activity / Event</label>
           <input name="activity_name" type="text" />
 
-          <label>Report Type:</label>
+          <label>Report Type</label>
           <select name="report_type" required>
             <option value="">Select</option>
             <option value="FDP">FDP</option>
@@ -106,45 +106,63 @@ export default function FDPSTTPForm() {
           <input name="venue" type="text" />
 
           <label>Date (From)</label>
-          <input name="date_from" type="date" />
+          <input name="start_date" type="date" />
 
           <label>Date (To)</label>
-          <input name="date_to" type="date" />
-
-          <label>Duration</label>
-          <input name="duration" type="text" />
+          <input name="end_date" type="date" />
 
           <label>Staff Coordinator(s)</label>
-          <textarea name="staff_coordinators" rows="2" />
+          <textarea name="staff_coordinator" rows="2" />
 
           <label>Resource Persons Details</label>
-          <textarea name="resource_persons" rows="3" />
+          <textarea name="details_of_resource_person" rows="3" />
         </div>
       </section>
 
-      <PdfWithCaptionSection title="Brochure (PDF)" items={brochures} setItems={setBrochures} />
-      <PdfWithCaptionSection title="List of Participants (PDF)" items={participants} setItems={setParticipants} />
-      <PdfWithCaptionSection title="Attendance of Participants (PDF)" items={attendance} setItems={setAttendance} />
-      <PdfWithCaptionSection title="Geo-tagged Photographs (PDF)" items={geoPhotos} setItems={setGeoPhotos} />
+      {/* PDF SECTIONS */}
+      <PdfWithCaptionSection
+        title="Brochure (PDF)"
+        items={brochures}
+        setItems={setBrochures}
+      />
+
+      <PdfWithCaptionSection
+        title="List of Participants (PDF)"
+        items={participants}
+        setItems={setParticipants}
+      />
+
+      <PdfWithCaptionSection
+        title="Attendance of Participants (PDF)"
+        items={attendance}
+        setItems={setAttendance}
+      />
+
+      <PdfWithCaptionSection
+        title="Geo-tagged Photographs (PDF)"
+        items={geoPhotos}
+        setItems={setGeoPhotos}
+      />
 
       {/* SUMMARY */}
       <section className="form-section">
-        <h3>Brief Summary of the Activity</h3>
+        <h3>Brief Summary</h3>
         <div className="form-grid">
           <label>Objectives</label>
-          <textarea name="objectives" rows="3" />
+          <textarea name="activity_objectives" rows="3" />
 
           <label>Technical Description</label>
-          <textarea name="technical_description" rows="4" />
+          <textarea name="activity_description" rows="4" />
 
           <label>Outcomes</label>
-          <textarea name="outcomes" rows="3" />
+          <textarea name="activity_outcomes" rows="3" />
         </div>
       </section>
 
-      {/* FEEDBACK */}
+      {/* FEEDBACK — PDF ONLY */}
       <section className="form-section">
-        <h3>Sample Feedback with Summary (PDF)</h3>
+        <h3>Feedback Summary (PDF)</h3>
+
         {feedbackPDFs.map((_, index) => (
           <div className="form-grid" key={index}>
             <label>Upload Feedback PDF</label>
@@ -159,8 +177,9 @@ export default function FDPSTTPForm() {
             />
           </div>
         ))}
-        <button type="button" className="add-btn" onClick={() => setFeedbackPDFs([...feedbackPDFs, null])}>
-          + Add More Feedback PDFs
+
+        <button type="button" className="add-btn" onClick={addFeedback}>
+          + Add More
         </button>
       </section>
 
@@ -168,8 +187,8 @@ export default function FDPSTTPForm() {
       <section className="form-section">
         <h3>Impact Analysis</h3>
         <div className="form-grid">
-          <label>Impact Analysis Description</label>
-          <textarea name="impact_analysis" rows="4" />
+          <label>Impact Description</label>
+          <textarea name="activity_impact_analysis" rows="4" />
         </div>
       </section>
 
@@ -182,10 +201,12 @@ export default function FDPSTTPForm() {
         </div>
       </section>
 
-      <div className="form-section">
-        <button type="submit" className="submit-btn">Save Form</button>
-      </div>
-
+      {/* SAVE */}
+      <section className="form-section">
+        <button type="submit" className="submit-btn">
+          Save Form
+        </button>
+      </section>
     </form>
   );
 }

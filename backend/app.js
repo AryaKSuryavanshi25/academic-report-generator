@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import reportRoutes from "./routes/reports.routes.js";
+import reportDownloadRoutes from "./routes/reportDownload.routes.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/reports", reportRoutes);
+app.use("/api", reportDownloadRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {

@@ -9,6 +9,8 @@ export default function CertificationForm() {
   const [attendance, setAttendance] = useState([{ file: null, caption: "" }]);
   const [geoPhotos, setGeoPhotos] = useState([{ file: null, caption: "" }]);
   const [feedbackPDFs, setFeedbackPDFs] = useState([null]);
+  const [savedReportId, setSavedReportId] = useState(null);
+
 
   const addFeedback = () => setFeedbackPDFs([...feedbackPDFs, null]);
 
@@ -66,9 +68,11 @@ export default function CertificationForm() {
         body: formData
       });
 
-      if (!res.ok) throw new Error("Failed");
-      alert("Certification report saved successfully ✅");
-      form.reset();
+    if (!res.ok) throw new Error("Failed");
+    const data = await res.json();
+    setSavedReportId(data.report_id);
+    alert("Certification report saved successfully ✅");
+
 
     } catch (err) {
       console.error(err);
@@ -101,9 +105,6 @@ export default function CertificationForm() {
 
           <label>Date (To)</label>
           <input name="end_date" type="date" />
-
-          <label>Duration</label>
-          <input type="text" />
 
           <label>Staff Coordinator(s)</label>
           <textarea name="staff_coordinator" rows="2" />
@@ -204,6 +205,22 @@ export default function CertificationForm() {
           Save Form
         </button>
       </section>
+      {savedReportId && (
+      <section className="form-section">
+        <h3>Download Report</h3>
+
+        <button
+          type="button"
+          className="submit-btn"
+          onClick={() =>
+            window.open(`http://localhost:5000/api/reports/${savedReportId}/pdf`)
+          }
+        >
+          Download PDF
+        </button>
+      </section>
+    )}
+
 
     </form>
   );
