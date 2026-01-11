@@ -1,5 +1,15 @@
 import db from "../config/db.js";
 
+const cleanText = (text) => {
+  if (!text) return null;
+  return text
+    .replace(/Ð/g, '') // Remove Ð
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .trim();
+};
+
 export const createReport = (req, res) => {
   const data = req.body;
   const files = req.files;
@@ -24,21 +34,20 @@ export const createReport = (req, res) => {
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
   `;
 
-
   const reportValues = [
     data.report_type,
-    data.activity_name,
-    data.venue,
+    cleanText(data.activity_name),                      // ✅ CLEAN
+    cleanText(data.venue),                              // ✅ CLEAN
     data.start_date,
     data.end_date,
-    data.staff_coordinator,
-    data.student_coordinator||null,
-    data.activity_objectives,
-    data.activity_description,
-    data.activity_outcomes,
-    data.activity_impact_analysis||null,
-    data.details_of_resource_person||null,
-    data.department_name||null
+    cleanText(data.staff_coordinator),                  // ✅ CLEAN
+    cleanText(data.student_coordinator) || null,        // ✅ CLEAN
+    cleanText(data.activity_objectives),                // ✅ CLEAN
+    cleanText(data.activity_description),               // ✅ CLEAN
+    cleanText(data.activity_outcomes),                  // ✅ CLEAN
+    cleanText(data.activity_impact_analysis) || null,   // ✅ CLEAN
+    cleanText(data.details_of_resource_person) || null, // ✅ CLEAN
+    cleanText(data.department_name) || null             // ✅ CLEAN
   ];
 
   db.query(reportQuery, reportValues, (err, result) => {
@@ -57,8 +66,8 @@ export const createReport = (req, res) => {
          VALUES (?,?,?)`,
         [
           reportId,
-          data.detailed_curriculum,
-          data.assessment_details
+          null,      
+          null        
         ]
       );
     }
@@ -116,20 +125,52 @@ export const createReport = (req, res) => {
       );
     }
 
-    /* 3️⃣ FILES */
+    /* 3️⃣ FILES - FIXED TO HANDLE MULTIPLE FILES WITH CAPTIONS */
     if (files && files.length > 0) {
+      // Group files by fieldname to match captions correctly
+      const filesByCategory = {};
+      
       files.forEach((file) => {
-        db.query(
-          `INSERT INTO report_files
-           (report_id, file_category, file_path, caption, uploaded_at)
-           VALUES (?, ?, ?, ?, NOW())`,
-          [
-            reportId,
-            file.fieldname,
-            file.path,
-            data[`caption_${file.fieldname}`] || null
-          ]
-        );
+        if (!filesByCategory[file.fieldname]) {
+          filesByCategory[file.fieldname] = [];
+        }
+        filesByCategory[file.fieldname].push(file);
+      });
+
+      // Process each category
+      Object.keys(filesByCategory).forEach((fieldname) => {
+        const categoryFiles = filesByCategory[fieldname];
+        const captionsKey = `caption_${fieldname}`;
+        
+        // Get captions array for this category
+        let captions = data[captionsKey];
+        
+        // Ensure captions is an array
+        if (!Array.isArray(captions)) {
+          captions = captions ? [captions] : [];
+        }
+
+        // Insert each file with its corresponding caption
+        categoryFiles.forEach((file, index) => {
+          const caption = cleanText(captions[index]) || null;
+          
+          db.query(
+            `INSERT INTO report_files
+             (report_id, file_category, file_path, caption, uploaded_at)
+             VALUES (?, ?, ?, ?, NOW())`,
+            [
+              reportId,
+              file.fieldname,
+              file.path,
+              caption
+            ],
+            (err) => {
+              if (err) {
+                console.error("File insert error:", err);
+              }
+            }
+          );
+        });
       });
     }
 
