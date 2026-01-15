@@ -79,8 +79,8 @@ export const createReport = (req, res) => {
          VALUES (?,?,?)`,
         [
           reportId,
-          data.nature_of_participants,
-          data.number_of_participants
+          cleanText(data.nature_of_participants)||null,
+          cleanText(data.number_of_participants)||null
         ]
       );
     }
@@ -92,8 +92,8 @@ export const createReport = (req, res) => {
          VALUES (?,?,?)`,
         [
           reportId,
-          data.nature_of_participants,
-          data.number_of_participants
+          cleanText(data.nature_of_participants)||null,
+          cleanText(data.number_of_participants)||null
         ]
       );
     }
@@ -118,9 +118,9 @@ export const createReport = (req, res) => {
          VALUES (?,?,?,?)`,
         [
           reportId,
-          data.number_of_beneficiaries,
-          data.number_of_student_volunteers,
-          data.collaborating_agency
+          cleanText(data.number_of_beneficiaries),
+          cleanText(data.number_of_student_volunteers),
+          cleanText(data.collaborating_agency)
         ]
       );
     }
