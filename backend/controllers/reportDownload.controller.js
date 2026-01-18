@@ -9,6 +9,8 @@ import { generateOutreachPDF} from"./pdfGenerators/outreachPDF.js";
 import { generateCulturalPDF} from "./pdfGenerators/culturalPDF.js";
 import { generateSportsPDF} from "./pdfGenerators/sportsPDF.js";
 import { generateCertificationWord} from "./wordGenerators/certificationWord.js"
+import {generateInHouseWord} from "./wordGenerators/inhouseWord.js";
+import {generateOutreachWord} from "./wordGenerators/outreachWord.js";
 
 
 /* ===================== GET REPORT TYPE ===================== */
@@ -92,6 +94,14 @@ export const downloadWord = async (req, res) => {
     switch (reportType) {
       case 'CERTIFICATION':
         await generateCertificationWord(req, res);
+        break;
+
+      case 'INHOUSE':
+        await generateInHouseWord(req, res);
+        break;
+
+      case 'OUTREACH':
+        await generateOutreachWord(req, res);
         break;
       
       default:
