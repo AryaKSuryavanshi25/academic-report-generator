@@ -8,6 +8,7 @@ import { generateInhousePDF } from "./pdfGenerators/inhousePDF.js";
 import { generateOutreachPDF} from"./pdfGenerators/outreachPDF.js";
 import { generateCulturalPDF} from "./pdfGenerators/culturalPDF.js";
 import { generateSportsPDF} from "./pdfGenerators/sportsPDF.js";
+import { generateCertificationWord} from "./wordGenerators/certificationWord.js"
 
 
 /* ===================== GET REPORT TYPE ===================== */
@@ -83,26 +84,26 @@ export const downloadPDF = async (req, res) => {
 };
 
 /* ===================== WORD DOWNLOAD HANDLER ===================== */
-// export const downloadWord = async (req, res) => {
-//   try {
-//     const reportId = req.params.id;
-//     const reportType = await getReportType(reportId);
+export const downloadWord = async (req, res) => {
+  try {
+    const reportId = req.params.id;
+    const reportType = await getReportType(reportId);
     
-//     switch (reportType) {
-//       case 'CERTIFICATION':
-//         await generateCertificationWord(req, res);
-//         break;
+    switch (reportType) {
+      case 'CERTIFICATION':
+        await generateCertificationWord(req, res);
+        break;
       
-//       default:
-//         res.status(400).send(`Word generation for report type "${reportType}" is not yet implemented. Please contact the development team.`);
-//     }
-//   } catch (err) {
-//     console.error("Word download error:", err);
-//     if (!res.headersSent) {
-//       res.status(500).send("Failed to generate Word document: " + err.message);
-//     }
-//   }
-// };
+      default:
+        res.status(400).send(`Word generation for report type "${reportType}" is not yet implemented. Please contact the development team.`);
+    }
+  } catch (err) {
+    console.error("Word download error:", err);
+    if (!res.headersSent) {
+      res.status(500).send("Failed to generate Word document: " + err.message);
+    }
+  }
+};
 
 // ❌ REMOVE THIS LINE - it's causing the duplicate export error
 // export { downloadPDF, downloadWord };
