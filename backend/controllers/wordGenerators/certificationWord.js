@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, Header, AlignmentType, Table, TableRow, TableCell, WidthType, BorderStyle } from "docx";
+import { Document, Packer, Paragraph, TextRun, Header, Footer, AlignmentType, Table, TableRow, TableCell, WidthType, BorderStyle, VerticalAlign } from "docx";
 import db from "../../config/db.js";
 import { 
   createWordFileSection, 
@@ -111,34 +111,39 @@ export const generateCertificationWord = async (req, res) => {
     // Certificate
     sections.push(...await createWordFileSection("11. Sample Certificate", fileGroups['certificate']));
 
-    // ===================== SIGNATURE SECTION (TABLE-BASED) =====================
-// ===================== SIGNATURE SECTION (PARAGRAPH-BASED) =====================
-    sections.push(
-      // Add space before signatures
-      new Paragraph({ 
-        text: "", 
-        spacing: { before: 800 }
-      }),
-      
-      // Staff Coordinator and HOD labels on same line
-      new Paragraph({
-        children: [
-          new TextRun({ text: "Staff Coordinator", bold: true, size: 22 }),
-          new TextRun({ text: "\t\t\t\t\t\t\t", size: 22 }), // Tabs to push to right
-          new TextRun({ text: "HOD", bold: true, size: 22 })
-        ],
-        spacing: { after: 100 }
-      }),
-      
-      // Signature lines on same line
-      new Paragraph({
-        children: [
-          new TextRun({ text: "___________________________", size: 22 }),
-          new TextRun({ text: "\t\t\t", size: 22 }), // Tabs to space them
-          new TextRun({ text: "___________________________", size: 22 })
-        ]
-      })
-    );
+    // ✅ SIGNATURE AT THE END OF CONTENT (NOT IN FOOTER)
+// ✅ SIGNATURE BLOCK — moves only if it doesn't fit
+  sections.push(
+  // Spacer before signatures
+  new Paragraph({
+    text: "",
+    spacing: { before: 800 },
+    keepNext: true
+  }),
+
+  // Labels
+  new Paragraph({
+    children: [
+      new TextRun({ text: "Staff Coordinator", bold: true, size: 22 }),
+      new TextRun({ text: "\t\t\t\t\t\t\t", size: 22 }),
+      new TextRun({ text: "HOD", bold: true, size: 22 })
+    ],
+    spacing: { after: 100 },
+    keepLines: true,
+    keepNext: true
+  }),
+
+  // Signature lines
+  new Paragraph({
+    children: [
+      new TextRun({ text: "___________________________", size: 22 }),
+      new TextRun({ text: "\t\t\t", size: 22 }),
+      new TextRun({ text: "___________________________", size: 22 })
+    ],
+    keepLines: true
+  })
+);
+
 
     // Create document with header on all pages
     const doc = new Document({
@@ -176,3 +181,4 @@ export const generateCertificationWord = async (req, res) => {
 };
 
 export default generateCertificationWord;
+//fine
