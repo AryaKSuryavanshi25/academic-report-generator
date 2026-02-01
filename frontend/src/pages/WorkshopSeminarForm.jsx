@@ -3,17 +3,20 @@ import "../styles/form-styles.css";
 import PdfWithCaptionSection from "./PdfWithCaptionSection";
 
 export default function WorkshopSeminarForm() {
-
   const [brochures, setBrochures] = useState([{ file: null, caption: "" }]);
   const [attendance, setAttendance] = useState([{ file: null, caption: "" }]);
   const [geoPhotos, setGeoPhotos] = useState([{ file: null, caption: "" }]);
   const [feedbackFiles, setFeedbackFiles] = useState([null]);
+
+  // ✅ FIX: savedReportId state added (this was missing)
+  const [savedReportId, setSavedReportId] = useState(null);
 
   const addFeedback = () => setFeedbackFiles([...feedbackFiles, null]);
 
   /* ================= SUBMIT HANDLER ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const form = e.target;
     const formData = new FormData();
 
@@ -28,7 +31,10 @@ export default function WorkshopSeminarForm() {
     formData.append("number_of_participants", form.number_of_participants.value);
     formData.append("student_coordinator", form.student_coordinator.value);
     formData.append("staff_coordinator", form.staff_coordinator.value);
-    formData.append("details_of_resource_person", form.details_of_resource_person.value);
+    formData.append(
+      "details_of_resource_person",
+      form.details_of_resource_person.value
+    );
 
     /* SUMMARY */
     formData.append("activity_objectives", form.activity_objectives.value);
@@ -64,9 +70,30 @@ export default function WorkshopSeminarForm() {
         body: formData
       });
 
-      if (!res.ok) throw new Error("Failed");
-      alert("Workshop / Seminar report saved successfully ✅");
+      if (!res.ok) throw new Error("Failed to save report");
+
+      // ✅ FIX: backend should return report_id, so we store it
+      // Example backend response should be: { report_id: 12, message: "saved" }
+      const data = await res.json();
+
+      // Support multiple possible keys to prevent crash
+      const id = data?.report_id || data?.id || data?.insertId;
+
+      if (!id) {
+        alert("Saved ✅ but Report ID not received from backend");
+      } else {
+        setSavedReportId(id);
+        alert("Workshop / Seminar report saved successfully ✅");
+      }
+
+      // Reset HTML form
       form.reset();
+
+      // Reset React file inputs states (important!)
+      setBrochures([{ file: null, caption: "" }]);
+      setAttendance([{ file: null, caption: "" }]);
+      setGeoPhotos([{ file: null, caption: "" }]);
+      setFeedbackFiles([null]);
 
     } catch (err) {
       console.error(err);
@@ -77,17 +104,19 @@ export default function WorkshopSeminarForm() {
 
   return (
     <form className="fdp-form" onSubmit={handleSubmit}>
-
       {/* BASIC DETAILS */}
       <section className="form-section">
         <h3>Basic Details</h3>
         <div className="form-grid">
-
           <label>Name of Department / Institute Level Committee</label>
           <input name="department_name" type="text" />
 
           <label>Name of the Activity / Event</label>
-          <input name="activity_name" type="text" placeholder="Seminar / Workshop on ..." />
+          <input
+            name="activity_name"
+            type="text"
+            placeholder="Seminar / Workshop on ..."
+          />
 
           <label>Report Type</label>
           <select name="report_type" required>
@@ -163,7 +192,7 @@ export default function WorkshopSeminarForm() {
               accept="application/pdf"
               onChange={(e) => {
                 const copy = [...feedbackFiles];
-                copy[index] = e.target.files[0];
+                copy[index] = e.target.files?.[0] || null;
                 setFeedbackFiles(copy);
               }}
             />
@@ -207,6 +236,24 @@ export default function WorkshopSeminarForm() {
         </button>
       </section>
 
+      {/* ✅ DOWNLOAD PDF SECTION */}
+      {savedReportId && (
+        <section className="form-section">
+          <h3>Download Report</h3>
+          <button
+            type="button"
+            className="submit-btn"
+            onClick={() =>
+              window.open(
+                `http://localhost:5000/api/reports/${savedReportId}/pdf`,
+                "_blank"
+              )
+            }
+          >
+            Download PDF
+          </button>
+        </section>
+      )}
     </form>
   );
 }

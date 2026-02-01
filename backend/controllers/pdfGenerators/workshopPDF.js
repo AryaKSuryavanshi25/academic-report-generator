@@ -16,8 +16,16 @@ const getReportData = (reportId) => {
     db.query(
       `
       SELECT r.*,
+<<<<<<< HEAD
              rf.file_id, rf.file_category, rf.file_path, rf.caption
       FROM reports r
+=======
+             wd.nature_of_participants,
+             wd.number_of_participants,
+             rf.file_id, rf.file_category, rf.file_path, rf.caption
+      FROM reports r
+      LEFT JOIN workshop_details wd ON r.report_id = wd.report_id
+>>>>>>> 5c71f6020240245f86cd06baae458debdf2c6e89
       LEFT JOIN report_files rf ON r.report_id = rf.report_id
       WHERE r.report_id = ?
       ORDER BY rf.file_category, rf.file_id

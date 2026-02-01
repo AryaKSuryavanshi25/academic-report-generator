@@ -16,8 +16,16 @@ const getReportData = (reportId) => {
     db.query(
       `
       SELECT r.*,
+<<<<<<< HEAD
              rf.file_id, rf.file_category, rf.file_path, rf.caption
       FROM reports r
+=======
+             sd.nature_of_participants,
+             sd.number_of_participants,
+             rf.file_id, rf.file_category, rf.file_path, rf.caption
+      FROM reports r
+      LEFT JOIN seminar_details sd ON r.report_id = sd.report_id
+>>>>>>> 5c71f6020240245f86cd06baae458debdf2c6e89
       LEFT JOIN report_files rf ON r.report_id = rf.report_id
       WHERE r.report_id = ?
       ORDER BY rf.file_category, rf.file_id
@@ -247,4 +255,3 @@ export const generateSeminarPDF = async (req, res) => {
 };
 
 export default generateSeminarPDF;
-    
