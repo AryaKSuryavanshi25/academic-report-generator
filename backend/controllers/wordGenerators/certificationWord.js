@@ -78,13 +78,15 @@ export const generateCertificationWord = async (req, res) => {
     sections.push(createFieldRow("7. Staff Coordinator", report.staff_coordinator));
 
     // Resource Persons
-    sections.push(new Paragraph({
-      children: [
-        new TextRun({ text: "8. Details of Resource Persons: ", bold: true, size: 22 }),
-        new TextRun({ text: report.details_of_resource_person || "N/A", size: 22 })
-      ],
-      spacing: { after: 300 }
-    }));
+    // sections.push(new Paragraph({
+    //   children: [
+    //     new TextRun({ text: "8. Details of Resource Persons: ", bold: true, size: 22 }),
+    //     new TextRun({ text: report.details_of_resource_person || "N/A", size: 22 })
+    //   ],
+    //   spacing: { after: 300 }
+    // }));
+    // Resource Persons - ✅ CHANGED TO MULTI-LINE FORMAT
+    sections.push(...createSubSectionMultiLineNoBullets("8. Details of Resource Persons", report.details_of_resource_person));
 
     // Section 9 - Bold (not blue heading)
     sections.push(createBoldSection("9. Brief Summary of the Activity/Event"));
@@ -134,14 +136,14 @@ export const generateCertificationWord = async (req, res) => {
   }),
 
   // Signature lines
-  new Paragraph({
-    children: [
-      new TextRun({ text: "___________________________", size: 22 }),
-      new TextRun({ text: "\t\t\t", size: 22 }),
-      new TextRun({ text: "___________________________", size: 22 })
-    ],
-    keepLines: true
-  })
+  // new Paragraph({
+  //   children: [
+  //     new TextRun({ text: "___________________________", size: 22 }),
+  //     new TextRun({ text: "\t\t\t", size: 22 }),
+  //     new TextRun({ text: "___________________________", size: 22 })
+  //   ],
+  //   keepLines: true
+  // })
 );
 
 

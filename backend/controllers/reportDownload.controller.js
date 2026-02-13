@@ -11,8 +11,10 @@ import { generateSportsPDF} from "./pdfGenerators/sportsPDF.js";
 import { generateCertificationWord} from "./wordGenerators/certificationWord.js"
 import {generateInHouseWord} from "./wordGenerators/inhouseWord.js";
 import {generateOutreachWord} from "./wordGenerators/outreachWord.js";
-
-
+import {generateFDPSTTPWord} from "./wordGenerators/fdpSttpWord.js";
+import {generateSportsCulturalWord} from "./wordGenerators/sportsCulturalWord.js"
+import {generateWorkshopWord} from "./wordGenerators/workshopWord.js";
+import {generateSeminarWord} from "./wordGenerators/seminarWord.js";
 /* ===================== GET REPORT TYPE ===================== */
 const getReportType = (reportId) => {
   return new Promise((resolve, reject) => {
@@ -104,6 +106,30 @@ export const downloadWord = async (req, res) => {
         await generateOutreachWord(req, res);
         break;
       
+      case 'FDP':
+        await generateFDPSTTPWord(req, res);
+        break;
+      
+      case 'STTP':
+        await generateFDPSTTPWord(req, res);
+        break;
+
+      case 'SPORTS':
+        await generateSportsCulturalWord(req, res);
+        break;
+
+      case 'CULTURAL':
+        await generateSportsCulturalWord(req, res);
+        break;
+      
+      case 'SEMINAR':
+        await generateSeminarWord(req, res);
+        break;
+      
+      case 'WORKSHOP':
+        await generateWorkshopWord(req, res);
+        break;
+
       default:
         res.status(400).send(`Word generation for report type "${reportType}" is not yet implemented. Please contact the development team.`);
     }

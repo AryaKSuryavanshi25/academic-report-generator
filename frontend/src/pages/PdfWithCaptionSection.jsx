@@ -40,14 +40,13 @@ export default function PdfWithCaptionSection({ title, items, setItems }) {
           
           <input
             type="file"
-            accept="application/pdf*"
+            accept="application/pdf" 
             onChange={(e) => handleFileChange(index, e.target.files[0])}
           />
 
           <label>Caption for File {index + 1}</label>
           <input
             type="text"
-            // Placeholder is now removed
             value={item.caption}
             onChange={(e) => handleCaptionChange(index, e.target.value)}
           />

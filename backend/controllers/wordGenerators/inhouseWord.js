@@ -1,14 +1,15 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell, WidthType, BorderStyle } from "docx";
+import { Document, Packer, Paragraph, TextRun, Header, Footer, AlignmentType, Table, TableRow, TableCell, WidthType, BorderStyle, VerticalAlign } from "docx";
 import db from "../../config/db.js";
-import fs from "fs";
-import path from "path";
 import { 
-  createWordFileSection,
-  formatReportDate,
+  createWordFileSection, 
+  formatReportDate, 
   groupFilesByCategory,
   createFieldRow,
   createBoldSection,
-  createSubSection
+  createSubSection,
+  createSubSectionMultiLine,
+  createSubSectionMultiLineNoBullets,
+  createWordHeaderForAllPages
 } from "../shared/wordHelpers.js";
 
 /* ===================== FETCH DATA ===================== */
@@ -16,12 +17,14 @@ const getReportData = (reportId) => {
   return new Promise((resolve, reject) => {
     db.query(
       `
-      SELECT r.*, 
-             rf.file_id, rf.file_category, rf.file_path, rf.caption
-      FROM reports r
-      LEFT JOIN report_files rf ON r.report_id = rf.report_id
-      WHERE r.report_id = ? AND r.report_type = 'INHOUSE'
-      ORDER BY rf.file_category, rf.file_id
+    SELECT r.*, 
+          ih.nature_of_participants, 
+          ih.number_of_participants,        
+          rf.file_id, rf.file_category, rf.file_path, rf.caption
+    FROM reports r
+    LEFT JOIN inhouse_details ih ON r.report_id = ih.report_id
+    LEFT JOIN report_files rf ON r.report_id = rf.report_id
+    WHERE r.report_id = ?
       `,
       [reportId],
       (err, rows) => {
@@ -50,10 +53,11 @@ export const generateInHouseWord = async (req, res) => {
 
     // Build document sections
     const sections = [
-      // Title
+      // Title - Single, larger black text
       new Paragraph({
-        text: "Report on In-House Activity/Event",
-        heading: HeadingLevel.HEADING_1,
+        children: [
+          new TextRun({ text: "Report on In-House Activity", bold: true, size: 32 })
+        ],
         alignment: AlignmentType.CENTER,
         spacing: { after: 400 }
       }),
@@ -75,130 +79,57 @@ export const generateInHouseWord = async (req, res) => {
 
     // Section 8 - Bold (not blue heading)
     sections.push(createBoldSection("8. Brief Summary of the Activity/Event"));
-    sections.push(createSubSection("a. Objectives", report.activity_objectives, true));
-    sections.push(createSubSection("b. Technical Description", report.activity_description, true));
-    sections.push(createSubSection("c. Outcomes", report.activity_outcomes, true));
+    
+    // With bullets
+    sections.push(...createSubSectionMultiLine("a. Objectives", report.activity_objectives, true));
+    
+    // Without bullets (plain paragraph)
+    sections.push(...createSubSectionMultiLineNoBullets("b. Technical Description", report.activity_description, true));
+    
+    // With bullets
+    sections.push(...createSubSectionMultiLine("c. Outcomes", report.activity_outcomes, true));
     
     sections.push(...await createWordFileSection("d. Attendance of Participants", fileGroups['attendance'], true));
 
     // Geo Photos
     sections.push(...await createWordFileSection("9. Geo tagged Photographs with Caption", fileGroups['geo_photos']));
 
-    // ===================== SIGNATURE SECTION (TABLE-BASED) =====================
+    // ✅ SIGNATURE BLOCK
     sections.push(
-      // Add space before signatures
-      new Paragraph({ text: "", spacing: { before: 800 } }),
-      
-      // Signature table
-      new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        borders: {
-          top: { style: BorderStyle.NONE },
-          bottom: { style: BorderStyle.NONE },
-          left: { style: BorderStyle.NONE },
-          right: { style: BorderStyle.NONE },
-          insideHorizontal: { style: BorderStyle.NONE },
-          insideVertical: { style: BorderStyle.NONE }
-        },
-        rows: [
-          // Names row
-          new TableRow({
-            children: [
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({ text: "Staff Coordinator", bold: true, size: 22 })
-                    ],
-                    alignment: AlignmentType.LEFT
-                  })
-                ],
-                width: { size: 50, type: WidthType.PERCENTAGE },
-                borders: {
-                  top: { style: BorderStyle.NONE },
-                  bottom: { style: BorderStyle.NONE },
-                  left: { style: BorderStyle.NONE },
-                  right: { style: BorderStyle.NONE }
-                }
-              }),
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({ text: "HOD", bold: true, size: 22 })
-                    ],
-                    alignment: AlignmentType.RIGHT
-                  })
-                ],
-                width: { size: 50, type: WidthType.PERCENTAGE },
-                borders: {
-                  top: { style: BorderStyle.NONE },
-                  bottom: { style: BorderStyle.NONE },
-                  left: { style: BorderStyle.NONE },
-                  right: { style: BorderStyle.NONE }
-                }
-              })
-            ]
-          }),
-          
-          // Signature lines row
-          new TableRow({
-            children: [
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({ text: "___________________________", size: 22 })
-                    ],
-                    alignment: AlignmentType.LEFT,
-                    spacing: { before: 100 }
-                  })
-                ],
-                width: { size: 50, type: WidthType.PERCENTAGE },
-                borders: {
-                  top: { style: BorderStyle.NONE },
-                  bottom: { style: BorderStyle.NONE },
-                  left: { style: BorderStyle.NONE },
-                  right: { style: BorderStyle.NONE }
-                }
-              }),
-              new TableCell({
-                children: [
-                  new Paragraph({
-                    children: [
-                      new TextRun({ text: "___________________________", size: 22 })
-                    ],
-                    alignment: AlignmentType.RIGHT,
-                    spacing: { before: 100 }
-                  })
-                ],
-                width: { size: 50, type: WidthType.PERCENTAGE },
-                borders: {
-                  top: { style: BorderStyle.NONE },
-                  bottom: { style: BorderStyle.NONE },
-                  left: { style: BorderStyle.NONE },
-                  right: { style: BorderStyle.NONE }
-                }
-              })
-            ]
-          })
-        ]
+      // Spacer before signatures
+      new Paragraph({
+        text: "",
+        spacing: { before: 800 },
+        keepNext: true
+      }),
+
+      // Labels
+      new Paragraph({
+        children: [
+          new TextRun({ text: "Staff Coordinator", bold: true, size: 22 }),
+          new TextRun({ text: "\t\t\t\t\t\t\t", size: 22 }),
+          new TextRun({ text: "HOD", bold: true, size: 22 })
+        ],
+        spacing: { after: 100 },
+        keepLines: true,
+        keepNext: true
       })
     );
 
-    // Create document
+    // Create document with header on all pages
     const doc = new Document({
       sections: [{
         properties: {
           page: {
             margin: {
-              top: 1440,
+              top: 1800,  // Increased top margin to accommodate header
               right: 1440,
               bottom: 1440,
               left: 1440
             }
           }
         },
+        headers: createWordHeaderForAllPages(),  // Header on all pages
         children: sections
       }]
     });
