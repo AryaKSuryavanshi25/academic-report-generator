@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, Header, Footer, AlignmentType, Table, TableRow, TableCell, WidthType, BorderStyle, VerticalAlign } from "docx";
+import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
 import db from "../../config/db.js";
 import { 
   createWordFileSection, 
@@ -6,7 +6,6 @@ import {
   groupFilesByCategory,
   createFieldRow,
   createBoldSection,
-  createSubSection,
   createSubSectionMultiLine,
   createSubSectionMultiLineNoBullets,
   createWordHeaderForAllPages
@@ -18,11 +17,8 @@ const getReportData = (reportId) => {
     db.query(
       `
       SELECT r.*, 
-             o.number_of_beneficiaries, o.number_of_student_volunteers, 
-             o.collaborating_agency,
              rf.file_id, rf.file_category, rf.file_path, rf.caption
       FROM reports r
-      LEFT JOIN outreach_details o ON r.report_id = o.report_id
       LEFT JOIN report_files rf ON r.report_id = rf.report_id
       WHERE r.report_id = ?
       ORDER BY rf.file_category, rf.file_id
@@ -37,10 +33,10 @@ const getReportData = (reportId) => {
 };
 
 /* ===================== WORD GENERATION ===================== */
-export const generateOutreachWord = async (req, res) => {
+export const generateSportsCulturalWord = async (req, res) => {
   try {
     const reportId = req.params.id;
-    console.log("Generating Outreach Word for report ID:", reportId);
+    console.log("Generating Sports/Cultural Word for report ID:", reportId);
     
     const rows = await getReportData(reportId);
     
@@ -52,58 +48,56 @@ export const generateOutreachWord = async (req, res) => {
     const fileGroups = groupFilesByCategory(rows);
     console.log("File groups:", Object.keys(fileGroups));
 
+    // Determine title based on report_type (SPORTS or CULTURAL)
+    const reportTypeLabel = report.report_type === "SPORTS"
+      ? "Sports Activity/Event"
+      : "Cultural Activity/Event";
+
     // Build document sections
     const sections = [
-      // Title - Single, larger black text
+      // Title - Single, larger black text (matching certification)
       new Paragraph({
         children: [
-          new TextRun({ text: "Report on Outreach Activity", bold: true, size: 32 })
+          new TextRun({ text: `Report on ${reportTypeLabel}`, bold: true, size: 32 })
         ],
         alignment: AlignmentType.CENTER,
         spacing: { after: 400 }
       }),
 
       // Basic Details
-      createFieldRow("Name of the Department / Institute Level Committee", report.department_name),
       createFieldRow("1. Name of the Activity/Event", report.activity_name),
       createFieldRow("2. Venue", report.venue),
       createFieldRow("3. Date and Duration", formatReportDate(report.start_date, report.end_date)),
-      createFieldRow("4. Number of Beneficiaries", report.number_of_beneficiaries?.toString()),
-      createFieldRow("5. Number of Student Volunteers", report.number_of_student_volunteers?.toString()),
+      createFieldRow("4. Number of Students Participated", report.number_of_students?.toString()),
+      createFieldRow("5. Student Coordinator", report.student_coordinator),
+      createFieldRow("6. Staff Coordinator", report.staff_coordinator),
     ];
 
-    // Brochure/Newspaper Cutting
-    sections.push(...await createWordFileSection("6. Brochure/Newspaper Cutting", fileGroups['brochure']));
+    // Brochure
+    sections.push(...await createWordFileSection("7. Brochure / Poster", fileGroups['brochure']));
 
-    // Coordinators
-    sections.push(createFieldRow("7. Student Coordinator", report.student_coordinator));
-    sections.push(createFieldRow("8. Staff Coordinator", report.staff_coordinator));
-    sections.push(createFieldRow("9. Collaborating Agency", report.collaborating_agency));
-
-    // Section 10 - Bold (not blue heading)
-    sections.push(createBoldSection("10. Brief Summary of the Activity/Event"));
+    // Section 8 - Bold heading
+    sections.push(createBoldSection("8. Brief Summary of the Activity/Event"));
     
     // With bullets
     sections.push(...createSubSectionMultiLine("a. Objectives", report.activity_objectives, true));
     
     // Without bullets (plain paragraph)
-    sections.push(...createSubSectionMultiLineNoBullets("b. Technical Description", report.activity_description, true));
+    sections.push(...createSubSectionMultiLineNoBullets("b. Description", report.activity_description, true));
     
     // With bullets
     sections.push(...createSubSectionMultiLine("c. Outcomes", report.activity_outcomes, true));
-    
-    sections.push(...await createWordFileSection("d. Attendance of Student Volunteers", fileGroups['attendance'], true));
-    
-    // With bullets
-    sections.push(...createSubSectionMultiLine("e. Impact Analysis", report.activity_impact_analysis, true));
+
+    // Attendance
+    sections.push(...await createWordFileSection("d. Attendance of Participants", fileGroups['attendance'], true));
 
     // Geo Photos
-    sections.push(...await createWordFileSection("11. Geo tagged Photographs with Caption", fileGroups['geo_photos']));
+    sections.push(...await createWordFileSection("9. Geo tagged Photographs with Caption", fileGroups['geo_photos']));
 
     // Certificate
-    sections.push(...await createWordFileSection("12. Sample Certificate", fileGroups['certificate']));
+    sections.push(...await createWordFileSection("10. Sample Certificate", fileGroups['certificate']));
 
-    // ✅ SIGNATURE BLOCK
+    // ✅ SIGNATURE BLOCK — moves only if it doesn't fit (matching certification)
     sections.push(
       // Spacer before signatures
       new Paragraph({
@@ -122,10 +116,20 @@ export const generateOutreachWord = async (req, res) => {
         spacing: { after: 100 },
         keepLines: true,
         keepNext: true
-      })
+      }),
+
+      // Signature lines
+      // new Paragraph({
+      //   children: [
+      //     new TextRun({ text: "___________________________", size: 22 }),
+      //     new TextRun({ text: "\t\t\t", size: 22 }),
+      //     new TextRun({ text: "___________________________", size: 22 })
+      //   ],
+      //   keepLines: true
+      // })
     );
 
-    // Create document with header on all pages
+    // Create document with header on all pages (matching certification)
     const doc = new Document({
       sections: [{
         properties: {
@@ -150,7 +154,7 @@ export const generateOutreachWord = async (req, res) => {
 
     // Send response
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    res.setHeader("Content-Disposition", `attachment; filename=outreach_report_${reportId}.docx`);
+    res.setHeader("Content-Disposition", `attachment; filename=sportscultural_report_${reportId}.docx`);
     res.send(buffer);
 
   } catch (err) {
@@ -160,4 +164,4 @@ export const generateOutreachWord = async (req, res) => {
   }
 };
 
-export default generateOutreachWord;
+export default generateSportsCulturalWord;

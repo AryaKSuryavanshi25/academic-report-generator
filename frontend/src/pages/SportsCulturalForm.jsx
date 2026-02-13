@@ -154,22 +154,38 @@ export default function SportsCulturalForm() {
       </section>
 
       {/* DOWNLOAD */}
-      {savedReportId && (
-        <section className="form-section">
-          <h3>Download Report</h3>
-          <button
-            type="button"
-            className="submit-btn"
-            onClick={() =>
-              window.open(
-                `http://localhost:5000/api/reports/${savedReportId}/pdf`
-              )
-            }
-          >
-            Download PDF
-          </button>
-        </section>
-      )}
+  {savedReportId && (
+    <section className="form-section">
+      <h3>Download Report</h3>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          className="submit-btn"
+          onClick={() =>
+            window.open(
+              `http://localhost:5000/api/reports/${savedReportId}/pdf`,
+              "_blank"
+            )
+          }
+        >
+          📄 Download PDF
+        </button>
+        
+        <button
+          type="button"
+          className="submit-btn"
+          onClick={() =>
+            window.open(
+              `http://localhost:5000/api/reports/${savedReportId}/word`,
+              "_blank"
+            )
+          }
+        >
+          📝 Download Word
+        </button>
+      </div>
+    </section>
+  )}
     </form>
   );
 }

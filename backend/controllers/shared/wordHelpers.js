@@ -150,14 +150,16 @@ export const createWordFileSection = async (category, files, indent = false) => 
     children: [new TextRun({ text: `${category}:`, bold: true, size: 20 })],
     spacing: { after: 100 },
     keepNext: true,
-    indent: indent ? { left: 720 } : undefined
+    indent: indent ? { left: 720 } : undefined,
+    alignment: AlignmentType.JUSTIFIED
   }));
 
   if (!files || files.length === 0) {
     sections.push(new Paragraph({ 
       children: [new TextRun({ text: "N/A", size: 20 })],
       spacing: { after: 150 },
-      indent: indent ? { left: 720 } : undefined
+      indent: indent ? { left: 720 } : undefined,
+      alignment: AlignmentType.JUSTIFIED
     }));
     return sections;
   }
@@ -189,7 +191,8 @@ export const createWordFileSection = async (category, files, indent = false) => 
           })
         ],
         spacing: { after: 100 },
-        indent: indent ? { left: 720 } : undefined
+        indent: indent ? { left: 720 } : undefined,
+        alignment: AlignmentType.JUSTIFIED
       }));
       continue;
     }
@@ -299,13 +302,15 @@ export const groupFilesByCategory = (rows) => {
   return groups;
 };
 
+// ✅ ADDED JUSTIFIED ALIGNMENT
 export const createFieldRow = (label, value) => {
   return new Paragraph({
     children: [
       new TextRun({ text: `${label}: `, bold: true, size: 22 }),
       new TextRun({ text: value || "N/A", size: 22 })
     ],
-    spacing: { after: 150 }
+    spacing: { after: 150 },
+    alignment: AlignmentType.JUSTIFIED
   });
 };
 
@@ -314,10 +319,12 @@ export const createBoldSection = (text) => {
     children: [
       new TextRun({ text: text, bold: true, size: 22 })
     ],
-    spacing: { before: 300, after: 200 }
+    spacing: { before: 300, after: 200 },
+    alignment: AlignmentType.JUSTIFIED
   });
 };
 
+// ✅ ADDED JUSTIFIED ALIGNMENT
 export const createSubSection = (label, content, indent = false) => {
   return new Paragraph({
     children: [
@@ -325,10 +332,12 @@ export const createSubSection = (label, content, indent = false) => {
       new TextRun({ text: content || "N/A", size: 20 })
     ],
     spacing: { after: 150 },
-    indent: indent ? { left: 720 } : undefined
+    indent: indent ? { left: 720 } : undefined,
+    alignment: AlignmentType.JUSTIFIED
   });
 };
 
+// ✅ ADDED JUSTIFIED ALIGNMENT TO CONTENT PARAGRAPHS
 export const createSubSectionMultiLine = (label, content, indent = false) => {
   const sections = [];
   
@@ -338,7 +347,8 @@ export const createSubSectionMultiLine = (label, content, indent = false) => {
       new TextRun({ text: `${label}:`, bold: true, size: 20 })
     ],
     spacing: { after: 100 },
-    indent: indent ? { left: 720 } : undefined
+    indent: indent ? { left: 720 } : undefined,
+    alignment: AlignmentType.JUSTIFIED
   }));
 
   // Content with bullets on next line
@@ -346,7 +356,8 @@ export const createSubSectionMultiLine = (label, content, indent = false) => {
     sections.push(new Paragraph({ 
       children: [new TextRun({ text: "N/A", size: 20 })],
       spacing: { after: 150 },
-      indent: indent ? { left: 720 + 360 } : { left: 360 } // Extra indent for content
+      indent: indent ? { left: 720 + 360 } : { left: 360 },
+      alignment: AlignmentType.JUSTIFIED
     }));
   } else {
     // Split content into sentences for bullet points
@@ -361,7 +372,8 @@ export const createSubSectionMultiLine = (label, content, indent = false) => {
           new TextRun({ text: `• ${sentence}.`, size: 20 })
         ],
         spacing: { after: index === sentences.length - 1 ? 150 : 80 },
-        indent: indent ? { left: 720 + 360 } : { left: 360 } // Extra indent for bullets
+        indent: indent ? { left: 720 + 360 } : { left: 360 },
+        alignment: AlignmentType.JUSTIFIED
       }));
     });
   }
@@ -369,6 +381,7 @@ export const createSubSectionMultiLine = (label, content, indent = false) => {
   return sections;
 };
 
+// ✅ ADDED JUSTIFIED ALIGNMENT
 export const createSubSectionMultiLineNoBullets = (label, content, indent = false) => {
   const sections = [];
   
@@ -378,7 +391,8 @@ export const createSubSectionMultiLineNoBullets = (label, content, indent = fals
       new TextRun({ text: `${label}:`, bold: true, size: 20 })
     ],
     spacing: { after: 100 },
-    indent: indent ? { left: 720 } : undefined
+    indent: indent ? { left: 720 } : undefined,
+    alignment: AlignmentType.JUSTIFIED
   }));
 
   // Content as plain paragraph (no bullets) on next line
@@ -386,7 +400,8 @@ export const createSubSectionMultiLineNoBullets = (label, content, indent = fals
     sections.push(new Paragraph({ 
       children: [new TextRun({ text: "N/A", size: 20 })],
       spacing: { after: 150 },
-      indent: indent ? { left: 720 + 360 } : { left: 360 }
+      indent: indent ? { left: 720 + 360 } : { left: 360 },
+      alignment: AlignmentType.JUSTIFIED
     }));
   } else {
     sections.push(new Paragraph({
@@ -395,10 +410,9 @@ export const createSubSectionMultiLineNoBullets = (label, content, indent = fals
       ],
       spacing: { after: 150 },
       indent: indent ? { left: 720 + 360 } : { left: 360 },
-      alignment: AlignmentType.LEFT
+      alignment: AlignmentType.JUSTIFIED
     }));
   }
 
   return sections;
 };
-//aligned with header
