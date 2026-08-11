@@ -52,8 +52,8 @@
 | **Database** | MySQL2 |
 | **Generators** | pdfkit, docx, sharp, pdf-poppler |
 
-## 🤝 Contributing
+##  Contributing
 Contributions, issues, and feature requests are welcome!
 
 ---
-*Built with ❤️ to make academic reporting seamless.*
+
